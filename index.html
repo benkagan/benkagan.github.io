@@ -14593,10 +14593,47 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Predicting-Ski-Hotel-Prices-in-Europe">Predicting Ski Hotel Prices in Europe<a class="anchor-link" href="#Predicting-Ski-Hotel-Prices-in-Europe">&#182;</a></h1><p>Ben Kagan;
-CMSC320;
-Maksym Morawski;
+<h1 id="Determining-the-Best-Value-Ski-Hotels-in-Europe">Determining the Best Value Ski Hotels in Europe<a class="anchor-link" href="#Determining-the-Best-Value-Ski-Hotels-in-Europe">&#182;</a></h1><p>Ben Kagan<br />
+CMSC320<br />
+Maksym Morawski<br />
 December 16th, 2022</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h2><p>Europe contains a vast number of ski resorts, ranging from beginner-friendly resorts suitable for a day-trip to mega resorts that have hosted international competitions. Many ski resorts play host to numerous hotels that market its proximity to the resort as a luxury. A wide variety of factors can help determine the value of one ski hotel over another. In addition to the standard factors including, but not limited to, price, customer reviews, and hotel quality, the value of a ski hotel heavily depends on factor such as the proximity to the ski resort and the ski resort's overall quality to name a few.</p>
+<p>In this tutorial, we will analyze data on over 400 ski hotels in Europe by performing data exploration and subsequently regression analysis and value determination.</p>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="Data-Collection">Data Collection<a class="anchor-link" href="#Data-Collection">&#182;</a></h2>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>The data obtained for this tutorial can be found on the following Kaggle page: <a href="https://www.kaggle.com/datasets/jacklacey/skiing-hotels">Skiing Hotels</a>.</p>
+<p>To start, we will import all the libraries used in this tutorial:</p>
 
 </div>
 </div>
@@ -14606,10 +14643,15 @@ December 16th, 2022</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">time</span>
 </pre></div>
 
      </div>
@@ -14622,10 +14664,11 @@ December 16th, 2022</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">hotels_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;ski_hotels.csv&quot;</span><span class="p">)</span>
+<span class="n">hotels_df</span> <span class="o">=</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span> <span class="p">,</span> <span class="mi">1</span><span class="p">:]</span>
 <span class="n">hotels_df</span>
 </pre></div>
 
@@ -14642,7 +14685,7 @@ December 16th, 2022</p>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
 
 
 
@@ -14665,7 +14708,6 @@ December 16th, 2022</p>
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Unnamed: 0</th>
       <th>country</th>
       <th>resort</th>
       <th>hotel</th>
@@ -14675,6 +14717,7 @@ December 16th, 2022</p>
       <th>totalPiste (km)</th>
       <th>totalLifts</th>
       <th>gondolas</th>
+      <th>chairlifts</th>
       <th>...</th>
       <th>blacks</th>
       <th>totalRuns</th>
@@ -14691,7 +14734,6 @@ December 16th, 2022</p>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0</td>
       <td>italy</td>
       <td>bardonecchia</td>
       <td>residence-tabor</td>
@@ -14701,6 +14743,7 @@ December 16th, 2022</p>
       <td>140</td>
       <td>23</td>
       <td>0</td>
+      <td>9</td>
       <td>...</td>
       <td>1.0</td>
       <td>42.0</td>
@@ -14715,7 +14758,6 @@ December 16th, 2022</p>
     </tr>
     <tr>
       <th>1</th>
-      <td>1</td>
       <td>italy</td>
       <td>bardonecchia</td>
       <td>residence-villa-frejus</td>
@@ -14725,6 +14767,7 @@ December 16th, 2022</p>
       <td>140</td>
       <td>23</td>
       <td>0</td>
+      <td>9</td>
       <td>...</td>
       <td>1.0</td>
       <td>42.0</td>
@@ -14739,7 +14782,6 @@ December 16th, 2022</p>
     </tr>
     <tr>
       <th>2</th>
-      <td>2</td>
       <td>bulgaria</td>
       <td>bansko</td>
       <td>hotel-mura</td>
@@ -14749,6 +14791,7 @@ December 16th, 2022</p>
       <td>70</td>
       <td>24</td>
       <td>1</td>
+      <td>7</td>
       <td>...</td>
       <td>1.0</td>
       <td>14.0</td>
@@ -14763,7 +14806,6 @@ December 16th, 2022</p>
     </tr>
     <tr>
       <th>3</th>
-      <td>3</td>
       <td>bulgaria</td>
       <td>borovets</td>
       <td>hotel-samokov</td>
@@ -14773,6 +14815,7 @@ December 16th, 2022</p>
       <td>58</td>
       <td>18</td>
       <td>1</td>
+      <td>4</td>
       <td>...</td>
       <td>1.0</td>
       <td>15.0</td>
@@ -14787,7 +14830,6 @@ December 16th, 2022</p>
     </tr>
     <tr>
       <th>4</th>
-      <td>4</td>
       <td>bulgaria</td>
       <td>bansko</td>
       <td>hotel-lion---bansko</td>
@@ -14797,6 +14839,7 @@ December 16th, 2022</p>
       <td>70</td>
       <td>24</td>
       <td>1</td>
+      <td>7</td>
       <td>...</td>
       <td>1.0</td>
       <td>14.0</td>
@@ -14835,7 +14878,6 @@ December 16th, 2022</p>
     </tr>
     <tr>
       <th>402</th>
-      <td>402</td>
       <td>france</td>
       <td>val-thorens</td>
       <td>hotel-fitz-roy</td>
@@ -14845,6 +14887,7 @@ December 16th, 2022</p>
       <td>600</td>
       <td>183</td>
       <td>40</td>
+      <td>69</td>
       <td>...</td>
       <td>32.0</td>
       <td>321.0</td>
@@ -14859,7 +14902,6 @@ December 16th, 2022</p>
     </tr>
     <tr>
       <th>403</th>
-      <td>403</td>
       <td>austria</td>
       <td>ischgl</td>
       <td>hotel-fliana</td>
@@ -14869,6 +14911,7 @@ December 16th, 2022</p>
       <td>230</td>
       <td>48</td>
       <td>9</td>
+      <td>27</td>
       <td>...</td>
       <td>15.0</td>
       <td>98.0</td>
@@ -14883,7 +14926,6 @@ December 16th, 2022</p>
     </tr>
     <tr>
       <th>404</th>
-      <td>404</td>
       <td>austria</td>
       <td>ischgl</td>
       <td>hotel-elisabeth</td>
@@ -14893,6 +14935,7 @@ December 16th, 2022</p>
       <td>230</td>
       <td>48</td>
       <td>9</td>
+      <td>27</td>
       <td>...</td>
       <td>15.0</td>
       <td>98.0</td>
@@ -14907,7 +14950,6 @@ December 16th, 2022</p>
     </tr>
     <tr>
       <th>405</th>
-      <td>405</td>
       <td>austria</td>
       <td>ischgl</td>
       <td>hotel-trofana-royal</td>
@@ -14917,6 +14959,7 @@ December 16th, 2022</p>
       <td>230</td>
       <td>48</td>
       <td>9</td>
+      <td>27</td>
       <td>...</td>
       <td>15.0</td>
       <td>98.0</td>
@@ -14931,7 +14974,6 @@ December 16th, 2022</p>
     </tr>
     <tr>
       <th>406</th>
-      <td>406</td>
       <td>austria</td>
       <td>hinterglemm</td>
       <td>hotel-alpine-palace</td>
@@ -14941,6 +14983,7 @@ December 16th, 2022</p>
       <td>200</td>
       <td>54</td>
       <td>15</td>
+      <td>16</td>
       <td>...</td>
       <td>5.0</td>
       <td>64.0</td>
@@ -14955,7 +14998,7 @@ December 16th, 2022</p>
     </tr>
   </tbody>
 </table>
-<p>407 rows × 24 columns</p>
+<p>407 rows × 23 columns</p>
 </div>
 </div>
 
@@ -14965,15 +15008,27 @@ December 16th, 2022</p>
 
 </div>
 
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>For convenience's sake, I will add a column labelled 'price ($)' to display the nightly price of the hotel in USD as opposed to in British pounds. As of December 14th, 2022. The conversion rate from 1 Pound sterling to United States Dollar is 1.23.</p>
+
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">hotels_df</span><span class="p">[</span><span class="s1">&#39;price ($)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hotels_df</span><span class="p">[</span><span class="s1">&#39;price (£)&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mf">1.23</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14981,6 +15036,1052 @@ December 16th, 2022</p>
 </div>
 </div>
 
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Column-Descriptions">Column Descriptions<a class="anchor-link" href="#Column-Descriptions">&#182;</a></h3><p>Next, we need to determine the meaning of every column in our dataset in order further explore the data. Provided below is a list giving a description on each column of the dataset:</p>
+<ul>
+<li>country: The country of the hotel and ski resort</li>
+<li>resort: The name of the ski resort in which the hotel is located</li>
+<li>hotel: The name of the hotel</li>
+<li>price (£): The nightly price for a room in the hotel in British pounds</li>
+<li>distance_from_lift_(m): The distance from the hotel to the nearest ski resort lift in meters</li>
+<li>altitude (m): The altitude of the hotel in meters</li>
+<li>totalPiste (km): The total distance of regularly maintained, skiable on the resort, in kilometers</li>
+<li>totalLifts: The total number of lifts in the ski resort</li>
+<li>gondolas: The number of gondolas in the ski resort</li>
+<li>chairLifts: The number of chair lifts in the ski resort</li>
+<li>dragLifts: The number of drag lifts in the ski resort</li>
+<li>blues: The number of blue-graded slopes in the ski resort</li>
+<li>reds: The number of red-graded slopes in the ski resort</li>
+<li>blacks: The number of black-graded slopes in the ski resort</li>
+<li>totalRuns: The total number of slopes in the ski resort</li>
+<li>link: the URL to the hotel's website</li>
+<li>sleeps: the total occupancy of the hotel</li>
+<li>decSnowLow2020(cm): The smallest snowfall received, in centimeters, from the month of December 2020 at the resort</li>
+<li>decSnowHigh2020(cm): The largest snowfall received, in centimeters, from the month of December 2020 at the resort</li>
+<li>janSnowLow2020(cm): The smallest snowfall received, in centimeters, from the month of January 2020 at the resort</li>
+<li>janSnowHigh2020(cm): The largest snowfall received, in centimeters, from the month of January 2020 at the resort</li>
+<li>febSnowLow2020(cm): The smallest snowfall received, in centimeters, from the month of February 2020 at the resort</li>
+<li>febSnowHigh2020(cm): The largest snowfall received, in centimeters, from the month of February 2020 at the resort</li>
+<li>price ($): The nightly price for a room in the hotel in USD</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Web-Scraping">Web Scraping<a class="anchor-link" href="#Web-Scraping">&#182;</a></h3><p>Upon further inspection, it appears that the provided dataset is missing some vital data about the ski hotels, such as customer reviews. To remedy this, we will go ahead and scrape the Google ratings, on a 5-star scale, for each hotel in the dataset.</p>
+<p>To achieve this, we will use the Selenium package to run a Chrome WebDriver to search into google the name of the hotel with the resort name. We will then parse the DOM Selenium's built-in <code>find_element()</code> function as well as XPath to retrieve the html element containing the star rating and the number of reviews. If a particular hotel search provides an abnormal result, the field is filled as unknown and consequently retrieved manually.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">scrape_google_results</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">hotel</span><span class="p">,</span> <span class="n">resort</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://www.google.com/search?q=</span><span class="si">{</span><span class="n">hotel</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">resort</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s1">&#39;//div[@id=&quot;rhs&quot;]/div/div/div[@class=&quot;I6TXqe&quot;]/div/div[1]/div/div[2]/div[@class=&quot;wDYxhc&quot;][1]/div/div&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">TAG_NAME</span><span class="p">,</span> <span class="n">tag</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;unknown&#39;</span>
+    <span class="k">return</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span>
+
+<span class="k">def</span> <span class="nf">get_rating</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">hotel</span><span class="p">,</span> <span class="n">resort</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">scrape_google_results</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">hotel</span><span class="p">,</span> <span class="n">resort</span><span class="p">,</span> <span class="s1">&#39;span&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_num_reviews</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">hotel</span><span class="p">,</span> <span class="n">resort</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">scrape_google_results</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">hotel</span><span class="p">,</span> <span class="n">resort</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    
+<span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">()</span>
+
+<span class="n">hotels_df</span><span class="p">[</span><span class="s1">&#39;ratings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">get_rating</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">hotel</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">resort</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">hotels_df</span><span class="p">[</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">get_num_reviews</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">hotel</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">resort</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Missing/Unknown-Data">Missing/Unknown Data<a class="anchor-link" href="#Missing/Unknown-Data">&#182;</a></h3><p>Let's examine the data and determine how many rows contain unknown values. We will use this to decide what needs to be researched or dropped.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">hotels_df</span> <span class="o">=</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;unknown&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="n">hotels_df</span> <span class="o">=</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="s1">&#39;price (£)&#39;</span><span class="p">:</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;distance_from_lift_(m)&#39;</span><span class="p">:</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;altitude (m)&#39;</span><span class="p">:</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;totalPiste (km)&#39;</span><span class="p">:</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;blues&#39;</span><span class="p">:</span> <span class="s1">&#39;int64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;reds&#39;</span><span class="p">:</span> <span class="s1">&#39;int64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;blacks&#39;</span><span class="p">:</span> <span class="s1">&#39;int64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;totalRuns&#39;</span><span class="p">:</span> <span class="s1">&#39;int64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;sleeps&#39;</span><span class="p">:</span> <span class="s1">&#39;int64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;decSnowLow2020(cm)&#39;</span><span class="p">:</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;decSnowHigh2020(cm)&#39;</span><span class="p">:</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;janSnowLow2020(cm)&#39;</span><span class="p">:</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;janSnowHigh2020(cm)&#39;</span><span class="p">:</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;febSnowLow2020(cm)&#39;</span><span class="p">:</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;febSnowHigh2020(cm)&#39;</span><span class="p">:</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;ratings&#39;</span><span class="p">:</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;num_reviews&#39;</span><span class="p">:</span> <span class="s1">&#39;int64&#39;</span><span class="p">},</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>The following line displays all hotels that had an abnormal hotel search, resulting in a missing rating and review count:</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">hotels_df</span><span class="p">[</span><span class="n">hotels_df</span><span class="p">[[</span><span class="s1">&#39;ratings&#39;</span><span class="p">,</span> <span class="s1">&#39;num_reviews&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[7]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>country</th>
+      <th>resort</th>
+      <th>hotel</th>
+      <th>price (£)</th>
+      <th>distance_from_lift_(m)</th>
+      <th>altitude (m)</th>
+      <th>totalPiste (km)</th>
+      <th>totalLifts</th>
+      <th>gondolas</th>
+      <th>chairlifts</th>
+      <th>...</th>
+      <th>sleeps</th>
+      <th>decSnowLow2020(cm)</th>
+      <th>decSnowHigh2020(cm)</th>
+      <th>janSnowLow2020(cm)</th>
+      <th>janSnowHigh2020(cm)</th>
+      <th>febSnowLow2020(cm)</th>
+      <th>febSnowHigh2020(cm)</th>
+      <th>price ($)</th>
+      <th>ratings</th>
+      <th>num_reviews</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>8</th>
+      <td>andorra</td>
+      <td>arinsal</td>
+      <td>hotel-xalet-verdu</td>
+      <td>606.0</td>
+      <td>300.0</td>
+      <td>1550.0</td>
+      <td>63.0</td>
+      <td>30</td>
+      <td>2</td>
+      <td>11</td>
+      <td>...</td>
+      <td>104</td>
+      <td>30.0</td>
+      <td>60.0</td>
+      <td>130.0</td>
+      <td>180.0</td>
+      <td>120.0</td>
+      <td>170.0</td>
+      <td>745.38</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>italy</td>
+      <td>sauze-d-oulx</td>
+      <td>hotel-clotes</td>
+      <td>692.0</td>
+      <td>100.0</td>
+      <td>1503.0</td>
+      <td>400.0</td>
+      <td>89</td>
+      <td>0</td>
+      <td>35</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>150.0</td>
+      <td>220.0</td>
+      <td>35.0</td>
+      <td>300.0</td>
+      <td>96.0</td>
+      <td>280.0</td>
+      <td>851.16</td>
+      <td></td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>austria</td>
+      <td>bad-hofgastein</td>
+      <td>apartments-aurora</td>
+      <td>704.0</td>
+      <td>NaN</td>
+      <td>870.0</td>
+      <td>208.0</td>
+      <td>49</td>
+      <td>11</td>
+      <td>19</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>48.0</td>
+      <td>155.0</td>
+      <td>45.0</td>
+      <td>176.0</td>
+      <td>865.92</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>finland</td>
+      <td>pyha</td>
+      <td>pyha-suites</td>
+      <td>737.0</td>
+      <td>NaN</td>
+      <td>280.0</td>
+      <td>80.0</td>
+      <td>9</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>4</td>
+      <td>40.0</td>
+      <td>50.0</td>
+      <td>60.0</td>
+      <td>70.0</td>
+      <td>64.0</td>
+      <td>74.0</td>
+      <td>906.51</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>55</th>
+      <td>austria</td>
+      <td>niederau-oberau</td>
+      <td>hotel-austria</td>
+      <td>761.0</td>
+      <td>NaN</td>
+      <td>826.0</td>
+      <td>48.0</td>
+      <td>47</td>
+      <td>7</td>
+      <td>8</td>
+      <td>...</td>
+      <td>94</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>50.0</td>
+      <td>106.0</td>
+      <td>48.0</td>
+      <td>114.0</td>
+      <td>936.03</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>63</th>
+      <td>bulgaria</td>
+      <td>pamporovo</td>
+      <td>hotel-orlovetz</td>
+      <td>772.0</td>
+      <td>3000.0</td>
+      <td>1650.0</td>
+      <td>18.0</td>
+      <td>19</td>
+      <td>0</td>
+      <td>6</td>
+      <td>...</td>
+      <td>210</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>60.0</td>
+      <td>85.0</td>
+      <td>166.0</td>
+      <td>170.0</td>
+      <td>949.56</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>70</th>
+      <td>austria</td>
+      <td>kitzbuhel</td>
+      <td>hotel-bruggerhof</td>
+      <td>783.0</td>
+      <td>2000.0</td>
+      <td>760.0</td>
+      <td>185.0</td>
+      <td>61</td>
+      <td>11</td>
+      <td>27</td>
+      <td>...</td>
+      <td>56</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>963.09</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>73</th>
+      <td>finland</td>
+      <td>yllas</td>
+      <td>yllas-saaga-spa-hotel</td>
+      <td>785.0</td>
+      <td>NaN</td>
+      <td>719.0</td>
+      <td>0.0</td>
+      <td>29</td>
+      <td>1</td>
+      <td>1</td>
+      <td>...</td>
+      <td>168</td>
+      <td>40.0</td>
+      <td>65.0</td>
+      <td>85.0</td>
+      <td>85.0</td>
+      <td>85.0</td>
+      <td>85.0</td>
+      <td>965.55</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>78</th>
+      <td>italy</td>
+      <td>courmayeur</td>
+      <td>hotel-courmayeur</td>
+      <td>795.0</td>
+      <td>NaN</td>
+      <td>1224.0</td>
+      <td>100.0</td>
+      <td>16</td>
+      <td>5</td>
+      <td>8</td>
+      <td>...</td>
+      <td>70</td>
+      <td>40.0</td>
+      <td>100.0</td>
+      <td>40.0</td>
+      <td>100.0</td>
+      <td>41.0</td>
+      <td>117.0</td>
+      <td>977.85</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>117</th>
+      <td>austria</td>
+      <td>zell-am-see</td>
+      <td>garden-hotel-daxer</td>
+      <td>861.0</td>
+      <td>NaN</td>
+      <td>758.0</td>
+      <td>136.0</td>
+      <td>55</td>
+      <td>13</td>
+      <td>18</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>0.0</td>
+      <td>58.0</td>
+      <td>43.0</td>
+      <td>147.0</td>
+      <td>46.0</td>
+      <td>150.0</td>
+      <td>1059.03</td>
+      <td>4.8</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>126</th>
+      <td>italy</td>
+      <td>sauze-d-oulx</td>
+      <td>hotel-new-miravalle</td>
+      <td>879.0</td>
+      <td>NaN</td>
+      <td>1503.0</td>
+      <td>400.0</td>
+      <td>89</td>
+      <td>0</td>
+      <td>35</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>150.0</td>
+      <td>220.0</td>
+      <td>35.0</td>
+      <td>300.0</td>
+      <td>96.0</td>
+      <td>280.0</td>
+      <td>1081.17</td>
+      <td></td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>159</th>
+      <td>italy</td>
+      <td>gressoney</td>
+      <td>chalet-du-lys</td>
+      <td>931.0</td>
+      <td>NaN</td>
+      <td>1637.0</td>
+      <td>150.0</td>
+      <td>13</td>
+      <td>3</td>
+      <td>5</td>
+      <td>...</td>
+      <td>58</td>
+      <td>10.0</td>
+      <td>110.0</td>
+      <td>30.0</td>
+      <td>120.0</td>
+      <td>30.0</td>
+      <td>120.0</td>
+      <td>1145.13</td>
+      <td>4.6</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>161</th>
+      <td>italy</td>
+      <td>passo-tonale</td>
+      <td>hotel-miramonti</td>
+      <td>941.0</td>
+      <td>NaN</td>
+      <td>1883.0</td>
+      <td>100.0</td>
+      <td>30</td>
+      <td>3</td>
+      <td>19</td>
+      <td>...</td>
+      <td>240</td>
+      <td>30.0</td>
+      <td>400.0</td>
+      <td>30.0</td>
+      <td>400.0</td>
+      <td>30.0</td>
+      <td>400.0</td>
+      <td>1157.43</td>
+      <td>4.2</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>171</th>
+      <td>italy</td>
+      <td>selva-val-gardena</td>
+      <td>hotel-pralong</td>
+      <td>967.0</td>
+      <td>150.0</td>
+      <td>1563.0</td>
+      <td>175.0</td>
+      <td>81</td>
+      <td>9</td>
+      <td>41</td>
+      <td>...</td>
+      <td>54</td>
+      <td>72.0</td>
+      <td>165.0</td>
+      <td>50.0</td>
+      <td>150.0</td>
+      <td>49.0</td>
+      <td>149.0</td>
+      <td>1189.41</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>176</th>
+      <td>andorra</td>
+      <td>soldeu</td>
+      <td>sporthotel</td>
+      <td>978.0</td>
+      <td>50.0</td>
+      <td>1800.0</td>
+      <td>210.0</td>
+      <td>67</td>
+      <td>4</td>
+      <td>32</td>
+      <td>...</td>
+      <td>330</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1202.94</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>190</th>
+      <td>austria</td>
+      <td>soll</td>
+      <td>hotel-gansleit</td>
+      <td>1002.0</td>
+      <td>NaN</td>
+      <td>703.0</td>
+      <td>250.0</td>
+      <td>94</td>
+      <td>11</td>
+      <td>38</td>
+      <td>...</td>
+      <td>60</td>
+      <td>0.0</td>
+      <td>25.0</td>
+      <td>33.0</td>
+      <td>76.0</td>
+      <td>48.0</td>
+      <td>85.0</td>
+      <td>1232.46</td>
+      <td>NaN</td>
+      <td>86</td>
+    </tr>
+    <tr>
+      <th>212</th>
+      <td>austria</td>
+      <td>mayrhofen</td>
+      <td>hotel-rose</td>
+      <td>1042.0</td>
+      <td>500.0</td>
+      <td>630.0</td>
+      <td>600.0</td>
+      <td>52</td>
+      <td>8</td>
+      <td>27</td>
+      <td>...</td>
+      <td>96</td>
+      <td>0.0</td>
+      <td>60.0</td>
+      <td>5.0</td>
+      <td>80.0</td>
+      <td>2.0</td>
+      <td>99.0</td>
+      <td>1281.66</td>
+      <td></td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>217</th>
+      <td>andorra</td>
+      <td>soldeu</td>
+      <td>hotel-xalet-montana</td>
+      <td>1051.0</td>
+      <td>NaN</td>
+      <td>1800.0</td>
+      <td>210.0</td>
+      <td>67</td>
+      <td>4</td>
+      <td>32</td>
+      <td>...</td>
+      <td>80</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1292.73</td>
+      <td></td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>220</th>
+      <td>france</td>
+      <td>alpe-d-huez</td>
+      <td>prestige-apart-hotel-l-eclose</td>
+      <td>1062.0</td>
+      <td>200.0</td>
+      <td>1850.0</td>
+      <td>249.0</td>
+      <td>82</td>
+      <td>15</td>
+      <td>23</td>
+      <td>...</td>
+      <td>150</td>
+      <td>71.0</td>
+      <td>120.0</td>
+      <td>151.0</td>
+      <td>276.0</td>
+      <td>141.0</td>
+      <td>241.0</td>
+      <td>1306.26</td>
+      <td>NaN</td>
+      <td>CHECK</td>
+    </tr>
+    <tr>
+      <th>228</th>
+      <td>finland</td>
+      <td>levi</td>
+      <td>hotel-crazy-reindeer</td>
+      <td>1079.0</td>
+      <td>NaN</td>
+      <td>200.0</td>
+      <td>44.0</td>
+      <td>27</td>
+      <td>2</td>
+      <td>2</td>
+      <td>...</td>
+      <td>314</td>
+      <td>35.0</td>
+      <td>45.0</td>
+      <td>65.0</td>
+      <td>75.0</td>
+      <td>90.0</td>
+      <td>115.0</td>
+      <td>1327.17</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>242</th>
+      <td>austria</td>
+      <td>zell-am-see</td>
+      <td>boutique-hotel-twotimez</td>
+      <td>1120.0</td>
+      <td>200.0</td>
+      <td>758.0</td>
+      <td>136.0</td>
+      <td>55</td>
+      <td>13</td>
+      <td>18</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>0.0</td>
+      <td>58.0</td>
+      <td>43.0</td>
+      <td>147.0</td>
+      <td>46.0</td>
+      <td>150.0</td>
+      <td>1377.60</td>
+      <td>4.5</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>249</th>
+      <td>austria</td>
+      <td>saalbach</td>
+      <td>landhaus-bauer</td>
+      <td>1143.0</td>
+      <td>200.0</td>
+      <td>1003.0</td>
+      <td>270.0</td>
+      <td>70</td>
+      <td>28</td>
+      <td>22</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>5.0</td>
+      <td>50.0</td>
+      <td>50.0</td>
+      <td>133.0</td>
+      <td>46.0</td>
+      <td>140.0</td>
+      <td>1405.89</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>253</th>
+      <td>france</td>
+      <td>tignes</td>
+      <td>hotel-arbina</td>
+      <td>1157.0</td>
+      <td>120.0</td>
+      <td>2100.0</td>
+      <td>300.0</td>
+      <td>89</td>
+      <td>10</td>
+      <td>45</td>
+      <td>...</td>
+      <td>50</td>
+      <td>75.0</td>
+      <td>165.0</td>
+      <td>185.0</td>
+      <td>233.0</td>
+      <td>191.0</td>
+      <td>242.0</td>
+      <td>1423.11</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>269</th>
+      <td>france</td>
+      <td>belle-plagne</td>
+      <td>hotel-club-mmv-deux-domaines</td>
+      <td>1184.0</td>
+      <td>NaN</td>
+      <td>2050.0</td>
+      <td>425.0</td>
+      <td>139</td>
+      <td>15</td>
+      <td>66</td>
+      <td>...</td>
+      <td>300</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1456.32</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>279</th>
+      <td>france</td>
+      <td>alpe-d-huez</td>
+      <td>hotel-royal-ours-blanc</td>
+      <td>1199.0</td>
+      <td>100.0</td>
+      <td>1850.0</td>
+      <td>249.0</td>
+      <td>82</td>
+      <td>15</td>
+      <td>23</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>71.0</td>
+      <td>120.0</td>
+      <td>151.0</td>
+      <td>276.0</td>
+      <td>141.0</td>
+      <td>241.0</td>
+      <td>1474.77</td>
+      <td></td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>282</th>
+      <td>austria</td>
+      <td>soll</td>
+      <td>hotel-postwirt</td>
+      <td>1213.0</td>
+      <td>800.0</td>
+      <td>703.0</td>
+      <td>250.0</td>
+      <td>94</td>
+      <td>11</td>
+      <td>38</td>
+      <td>...</td>
+      <td>124</td>
+      <td>0.0</td>
+      <td>25.0</td>
+      <td>33.0</td>
+      <td>76.0</td>
+      <td>48.0</td>
+      <td>85.0</td>
+      <td>1491.99</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>295</th>
+      <td>france</td>
+      <td>tignes-val-claret</td>
+      <td>hotel-val-claret</td>
+      <td>1243.0</td>
+      <td>50.0</td>
+      <td>2100.0</td>
+      <td>300.0</td>
+      <td>89</td>
+      <td>10</td>
+      <td>45</td>
+      <td>...</td>
+      <td>514</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>1528.89</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>326</th>
+      <td>austria</td>
+      <td>ischgl</td>
+      <td>hotel-seiblishof</td>
+      <td>1339.0</td>
+      <td>500.0</td>
+      <td>1400.0</td>
+      <td>230.0</td>
+      <td>48</td>
+      <td>9</td>
+      <td>27</td>
+      <td>...</td>
+      <td>114</td>
+      <td>20.0</td>
+      <td>70.0</td>
+      <td>50.0</td>
+      <td>120.0</td>
+      <td>63.0</td>
+      <td>131.0</td>
+      <td>1646.97</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>349</th>
+      <td>austria</td>
+      <td>st-anton</td>
+      <td>hotel-galzig</td>
+      <td>1424.0</td>
+      <td>NaN</td>
+      <td>1304.0</td>
+      <td>305.0</td>
+      <td>88</td>
+      <td>15</td>
+      <td>45</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>35.0</td>
+      <td>45.0</td>
+      <td>110.0</td>
+      <td>138.0</td>
+      <td>102.0</td>
+      <td>168.0</td>
+      <td>1751.52</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>29 rows × 26 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We will go ahead and manually Google search for each hotel listed above to retrieve their Google star rating and number of reviews.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.3</span><span class="p">,</span> <span class="mi">931</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">19</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">19</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mi">32</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">28</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">28</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.3</span><span class="p">,</span> <span class="mi">25</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">39</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">39</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.3</span><span class="p">,</span> <span class="mi">24</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">55</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">55</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.8</span><span class="p">,</span> <span class="mi">227</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">63</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">63</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># no hotel listing on Google</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">70</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">70</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mi">122</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">73</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">73</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.3</span><span class="p">,</span> <span class="mi">826</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">117</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">117</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.8</span><span class="p">,</span> <span class="mi">390</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">126</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">126</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.1</span><span class="p">,</span> <span class="mi">61</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">159</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">159</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.6</span><span class="p">,</span> <span class="mi">245</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">161</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">161</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mi">520</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">171</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">171</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.7</span><span class="p">,</span> <span class="mi">64</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">176</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">176</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.6</span><span class="p">,</span> <span class="mi">122</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">190</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">190</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.6</span><span class="p">,</span> <span class="mi">86</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">212</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">212</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mi">557</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">217</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">217</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># no reviews posted for Google listing</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">220</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">220</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># no reviews posted for Google listing</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">228</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">228</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mi">200</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">242</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">242</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mi">73</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">249</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">249</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mi">1</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">253</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">253</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.3</span><span class="p">,</span> <span class="mi">282</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">269</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">269</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.3</span><span class="p">,</span> <span class="mi">81</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">279</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">279</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.9</span><span class="p">,</span> <span class="mi">151</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">282</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">282</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># no reviews posted for Google listing</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">295</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">295</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mi">67</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">326</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">326</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># no reviews posted for Google listing</span>
+<span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">349</span><span class="p">,</span><span class="s1">&#39;ratings&#39;</span><span class="p">],</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">349</span><span class="p">,</span><span class="s1">&#39;num_reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.7</span><span class="p">,</span> <span class="mi">71</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We will drop the entries with no reviews, as that predictor is vital for our assessments:</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">hotels_df</span> <span class="o">=</span> <span class="n">hotels_df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ratings&#39;</span><span class="p">,</span> <span class="s1">&#39;num_reviews&#39;</span><span class="p">])</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>One column of note that contains missing data is the <code>distance_from_lift_(m)</code> column. Despite its importance on the value of a ski hotel, we have decided to not heavily consider this metric in our assessments since over half of the entries are missing this value.</p>
+<p>Due to the computational intensity of the web scraping in order to complete the dataset. I will save the DataFrame to a fresh .csv file in the event of data loss:</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">hotels_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;ski_hotels_complete.csv&#39;</span> <span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="Data-Exploration">Data Exploration<a class="anchor-link" href="#Data-Exploration">&#182;</a></h2><p>Now that we have fully acquired the data on European Ski Hotels, we will preform some exploration to examine the properties of the data.</p>
+
+</div>
+</div>
+</div>
 </div>
 </body>
 
